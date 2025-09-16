@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Page</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('assets/background.png');
+            /* Replace with your pixel art image */
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-size: cover;
+            image-rendering: pixelated;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #222;
+        }
+
+        .container {
+            width: 600px;
+            background: rgba(0, 0, 0, 0.85);
+            /* Semi-transparent overlay */
+            padding: 30px 40px 40px 40px;
+            margin-top: 50px;
+            /* Adjust positioning */
+            border-radius: 18px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 22px;
+            backdrop-filter: blur(2px);
+            /* Optional: blur background behind container */
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 24px;
+            background: rgba(15, 15, 15, 0.9);
+            border-radius: 7px;
+            overflow: hidden;
+            border: 3px solid #fff;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ae2727, #cc2e2e);
+            transition: width 0.5s ease-in-out;
+        }
+
+        .question {
+            width: 100%;
+            background: rgba(34, 34, 34, 0.95);
+            border-radius: 7px;
+            border: 3px solid #fff;
+            padding: 15px 10px;
+            font-size: 1.25rem;
+            color: #fff;
+            text-align: center;
+            margin: 0 0 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .options {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 18px;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 10px 0;
+        }
+
+        .options li {
+            background: rgba(144, 0, 255, 0.9);
+            color: #f2ff00;
+            border-radius: 7px;
+            border: 2px solid #fff;
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(1px);
+        }
+
+        .options li:hover {
+            background: rgba(68, 68, 68, 0.9);
+            border-color: #27ae60;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .options li.correct {
+            background-color: rgba(46, 204, 113, 0.9);
+            border-color: #27ae60;
+            cursor: default;
+            color: #fff;
+        }
+
+        .options li.wrong {
+            background-color: rgba(231, 76, 60, 0.9);
+            border-color: #c0392b;
+            cursor: default;
+            color: #fff;
+        }
+
+        .lives {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-top: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        .game-over {
+            font-size: 1.3rem;
+            color: #ff4444;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 6px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .next-btn {
+            background-color: rgba(39, 174, 96, 0.9);
+            border: 2px solid #fff;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .next-btn:hover {
+            background-color: rgba(33, 145, 80, 0.9);
+            transform: translateY(-2px);
+        }
+        .gif-container {
+    width: 100%;
+    height: 230px;
+    background: #333;
+    border: 4px solid #fff;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    margin-bottom: 20px; /* space below GIF */
+}
+
+.quiz-gif {
+    max-width: 100%;
+    max-height: 210px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+    </style>
+</head>
+
+<body>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Quiz Page</title>
+        <!-- Insert the CSS above here -->
+    </head>
+
+    <body>
+        
+
+        <div class="container">
+            <div class="gif-container">
+            <img src="assets/river.gif" alt="Quiz GIF" class="quiz-gif" />
+        </div>
+
+            <div class="status-bar">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div class="question" id="questionText"></div>
+
+            <ul class="options" id="optionsList"></ul>
+
+            <div class="lives" id="livesDisplay">Lives: 3</div>
+            <div id="gameOverMessage" class="game-over"></div>
+            <button id="nextButton" class="next-btn">Next Question</button>
+        </div>
+
+        <!-- Your existing JavaScript goes here -->
+    </body>
+
+    <script>
+        // Example questions structure - replace or populate from your game state/sessionStorage if needed
+        const questions = [
+            {
+                question: "Which of the following is the main cause of river pollution?",
+                options: [
+                    "Industrial waste discharge",
+                    "Excessive fishing activity",
+                    "Climate change",
+                    "Natural erosion"
+                ],
+                answerIndex: 0
+            },
+            {
+                question: "What type of waste mainly causes oxygen depletion in rivers?",
+                options: [
+                    "Organic wastes like sewage and animal waste",
+                    "Plastic waste",
+                    "Heavy metals",
+                    "Excessive sunlight"
+                ],
+                answerIndex: 0
+            },
+            {
+                question: "Which of these is a common effect of nutrient pollution in rivers?",
+                options: [
+                    "Algal blooms causing oxygen depletion",
+                    "Increase in fish population",
+                    "Improved water clarity",
+                    "Decrease in sediment levels"
+                ],
+                answerIndex: 0
+            },
+            {
+                question: "What human activity contributes most to sediment pollution in rivers?",
+                options: [
+                    "Deforestation and soil erosion",
+                    "Fishing",
+                    "Swimming",
+                    "Urban street cleaning"
+                ],
+                answerIndex: 0
+            },
+            {
+                question: "Which is the best method to reduce river pollution from agricultural run-off?",
+                options: [
+                    "Using buffer zones of plants near riverbanks",
+                    "Increasing fertilizer use",
+                    "Building dams",
+                    "Draining wetlands"
+                ],
+                answerIndex: 0
+            }
+        ];
+
+
+        let currentQuestionIndex = 0;
+        let lives = 3;
+        const totalQuestions = questions.length;
+        const progressBar = document.getElementById('progressBar');
+        const livesDisplay = document.getElementById('livesDisplay');
+        const questionText = document.getElementById('questionText');
+        const optionsList = document.getElementById('optionsList');
+        const nextButton = document.getElementById('nextButton');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+
+        function updateProgressBar() {
+            const progressWidth = ((totalQuestions - currentQuestionIndex) / totalQuestions) * 100;
+            progressBar.style.width = `${progressWidth}%`;
+        }
+
+        function updateLives() {
+            livesDisplay.textContent = `Lives: ${lives}`;
+        }
+
+        function showQuestion(index) {
+            const q = questions[index];
+            questionText.textContent = q.question;
+            optionsList.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const li = document.createElement('li');
+                li.textContent = opt;
+                li.dataset.index = i;
+                li.addEventListener('click', onOptionClick);
+                optionsList.appendChild(li);
+            });
+            nextButton.style.display = 'none';
+            gameOverMessage.textContent = '';
+        }
+
+        function onOptionClick(event) {
+            const selectedLi = event.target;
+            const selectedIdx = Number(selectedLi.dataset.index);
+            const correctIdx = questions[currentQuestionIndex].answerIndex;
+
+            if (selectedIdx === correctIdx) {
+                selectedLi.classList.add('correct');
+                currentQuestionIndex++;
+                updateProgressBar();
+
+                if (currentQuestionIndex === totalQuestions) {
+                    gameOverMessage.textContent = 'You answered all questions correctly! Returning to game...';
+                    nextButton.style.display = 'none';
+
+                    setTimeout(() => {
+                        window.location.href = 'canvas.html'; // Adjust URL to your main game page
+                    }, 2000);
+                } else {
+                    nextButton.style.display = 'block';
+                }
+            } else {
+                selectedLi.classList.add('wrong');
+                lives--;
+                updateLives();
+                if (lives === 0) {
+                    gameOverMessage.textContent = 'Game Over! You lost all lives.';
+                    nextButton.style.display = 'none';
+                    disableOptions();
+                }
+            }
+            disableOptions();
+        }
+
+
+        function disableOptions() {
+            [...optionsList.children].forEach(li => {
+                li.removeEventListener('click', onOptionClick);
+                li.style.cursor = 'default';
+            });
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < totalQuestions) {
+                showQuestion(currentQuestionIndex);
+            }
+        });
+
+        // Initialize UI on load
+        updateProgressBar();
+        updateLives();
+        showQuestion(currentQuestionIndex);
+        if (selectedIdx === correctIdx) {
+            selectedLi.classList.add('correct');
+            currentQuestionIndex++;
+            updateProgressBar();
+
+            if (currentQuestionIndex === totalQuestions) {
+                gameOverMessage.textContent = 'You answered all questions correctly! Returning to game...';
+                nextButton.style.display = 'none';
+
+                sessionStorage.setItem('quizCompleted', 'true');  // <-- set flag
+
+                setTimeout(() => {
+                    window.location.href = 'canvas.html';  // your game page URL
+                }, 2000);
+            } else {
+                nextButton.style.display = 'block';
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
