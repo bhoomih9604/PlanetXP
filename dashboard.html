@@ -1,0 +1,100 @@
+<!-- dashboard.html -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dashboard — River Quest</title>
+<style>
+  body{margin:0;font-family:system-ui;background:linear-gradient(#041022,#021018);color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
+  .panel{width:760px;background:rgba(0,0,0,0.6);padding:26px;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .top{display:flex;justify-content:space-between;align-items:center}
+  .user{font-size:1.3rem}
+  .btn{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,#7be3ff,#ffb86b);cursor:pointer;color:#02111a;font-weight:700}
+  .stats{display:flex;gap:12px;margin-top:18px}
+  .card{background:rgba(255,255,255,0.03);padding:14px;border-radius:12px;flex:1}
+  .levels{margin-top:18px;display:flex;gap:10px}
+  .levelBtn{flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.03);cursor:pointer;border:2px solid rgba(255,255,255,0.04)}
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="top">
+      <div>
+        <div class="user" id="userName">Player</div>
+        <div id="levelInfo">Level 1</div>
+      </div>
+      <div>
+        <button id="playBtn" class="btn">Quick Play</button>
+        <button id="levelSelectBtn" class="btn" style="background:transparent;border:2px solid rgba(255,255,255,0.06);color:#fff;margin-left:10px">Levels</button>
+        <button id="logoutBtn" style="margin-left:10px;background:#ff6b6b;border:none;padding:8px 10px;border-radius:10px;color:#fff">Logout</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="card">
+        <div>Progress</div>
+        <div id="progressBar" style="height:16px;background:#042; border-radius:8px;margin-top:8px;overflow:hidden">
+          <div id="progressFill" style="height:100%;width:25%;background:linear-gradient(90deg,#7be3ff,#ffb86b)"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div>Score</div>
+        <div id="scoreVal" style="font-size:1.2rem;margin-top:6px">0</div>
+      </div>
+      <div class="card">
+        <div>Quizzes Done</div>
+        <div id="quizzesDone" style="font-size:1.2rem;margin-top:6px">0</div>
+      </div>
+    </div>
+
+    <div class="levels">
+      <button class="levelBtn" data-level="1">Level 1 — River Start</button>
+      <button class="levelBtn" data-level="2">Level 2 — Forest Stream</button>
+      <button class="levelBtn" data-level="3">Level 3 — Lake Outflow</button>
+    </div>
+  </div>
+
+<script>
+  const getUsers = ()=> JSON.parse(localStorage.getItem('rq_users')||'{}');
+  const current = JSON.parse(localStorage.getItem('rq_current')||'null');
+  if(!current){ window.location.href = 'login.html'; }
+  const username = current.username || 'Guest';
+  document.getElementById('userName').textContent = username;
+
+  const users = getUsers();
+  const profile = users[username] || users[username] === undefined ? (users[username] = {password:'',progress:{level:1,score:0,completedQuizzes:0}}) : users[username];
+
+  // ensure saved
+  localStorage.setItem('rq_users', JSON.stringify(users));
+  const progress = profile.progress || {level:1,score:0,completedQuizzes:0};
+  document.getElementById('levelInfo').textContent = `Level ${progress.level}`;
+  document.getElementById('scoreVal').textContent = progress.score || 0;
+  document.getElementById('quizzesDone').textContent = progress.completedQuizzes || 0;
+
+  // progress percent sample
+  const pct = Math.min(100, (progress.level - 1) / 4 * 100 + (progress.completedQuizzes * 5));
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    localStorage.removeItem('rq_current');
+    window.location.href = 'login.html';
+  });
+
+  document.getElementById('playBtn').addEventListener('click', ()=>{
+    // quick play current level
+    sessionStorage.setItem('rq_selected_level', progress.level);
+    window.location.href = 'canvas.html';
+  });
+
+  document.getElementById('levelSelectBtn').addEventListener('click', ()=> window.location.href = 'levels.html');
+
+  document.querySelectorAll('.levelBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const lvl = Number(btn.dataset.level);
+      sessionStorage.setItem('rq_selected_level', lvl);
+      window.location.href = 'canvas.html';
+    });
+  });
+</script>
+</body>
+</html>

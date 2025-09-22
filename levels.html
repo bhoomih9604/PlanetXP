@@ -1,0 +1,43 @@
+<!-- levels.html -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Levels — River Quest</title>
+<style>
+  body{background:linear-gradient(#041022,#021018);color:#fff;font-family:system-ui;margin:0;display:flex;align-items:center;justify-content:center;height:100vh}
+  .wrap{width:760px;background:rgba(0,0,0,0.6);padding:24px;border-radius:14px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .lvl{padding:18px;border-radius:12px;background:rgba(255,255,255,0.03);cursor:pointer;text-align:center}
+  .locked{opacity:.45;filter:grayscale(.5)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Choose Level</h2>
+  <div class="grid" id="levelsGrid"></div>
+</div>
+
+<script>
+  const current = JSON.parse(localStorage.getItem('rq_current')||'null');
+  if(!current) window.location.href='login.html';
+  const users = JSON.parse(localStorage.getItem('rq_users')||'{}');
+  const profile = users[current.username] || {progress:{level:1}};
+  const unlocked = profile.progress.level || 1;
+
+  const grid = document.getElementById('levelsGrid');
+  const TOTAL = 6;
+  for(let i=1;i<=TOTAL;i++){
+    const el = document.createElement('div');
+    el.className='lvl' + (i>unlocked ? ' locked':'');
+    el.innerHTML = `<div style="font-weight:700">Level ${i}</div><div style="font-size:.9rem;margin-top:6px">${i<=unlocked? 'Play':'Locked'}</div>`;
+    el.addEventListener('click', ()=> {
+      if(i>unlocked){ alert('Complete previous levels to unlock'); return; }
+      sessionStorage.setItem('rq_selected_level', i);
+      window.location.href='canvas.html';
+    });
+    grid.appendChild(el);
+  }
+</script>
+</body>
+</html>
